@@ -1,0 +1,15 @@
+﻿@{
+    var db = Database.Open("WebPagesScriptureNotes");
+    var selectedData = db.Query("SELECT * FROM Movies");
+    var grid = new WebGrid(source: selectedData);
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+
+    </body>
+</html>

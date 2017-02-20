@@ -1,0 +1,70 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Validation.RequireField("book", "Oops, you forgot the book.");
+    Validation.RequireField("chapter", "Oops, you forgot the chapter.");
+    Validation.RequireField("verse", "Oops, you forgot the verse.");
+    Validation.RequireField("date", "Please enter the date.");
+    Validation.RequireField("note", "You forgot your note.");
+
+    var book = "";
+    var chapter = "";
+    var verse = "";
+    var date = "";
+    var note = "";
+
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            book = Request.Form["book"];
+            chapter = Request.Form["chapter"];
+            verse = Request.Form["verse"];
+            date = Request.Form["date"];
+            note = Request.Form["note"];
+
+            var db = Database.Open("WebPagesMyScriptureJournal");
+            var insertCommand =
+                "INSERT INTO ScripNotes (Book, Chapter, Verse, Date, Note) Values(@0, @1, @2, @3, @4)";
+            db.Execute(insertCommand, book, chapter, verse, date, note);
+            Response.Redirect("~/Notes");
+        }
+    }
+}
+<h2>Add a Note</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Note Information</legend>
+        <p>
+            <label for="title">Book:</label>
+            <input type="text" name="book" value="@Request.Form["book"]" />
+            @Html.ValidationMessage("book")
+        </p>
+
+        <p>
+            <label for="genre">Chapter:</label>
+            <input type="text" name="chapter" value="@Request.Form["chapter"]" />
+            @Html.ValidationMessage("chapter")
+        </p>
+
+        <p>
+            <label for="year">Verse:</label>
+            <input type="text" name="verse" value="@Request.Form["verse"]" />
+            @Html.ValidationMessage("verse")
+        </p>
+
+        <p>
+            <label for="year">Date:</label>
+            <input type="text" name="date" value="@Request.Form["date"]" />
+            @Html.ValidationMessage("date")
+        </p>
+
+        <p>
+            <label for="year">Note:</label>
+            <input type="text" name="note" value="@Request.Form["note"]" />
+            @Html.ValidationMessage("note")
+        </p>
+
+        <p><input type="submit" name="buttonSubmit" value="Add Note" /></p>
+    </fieldset>
+</form>

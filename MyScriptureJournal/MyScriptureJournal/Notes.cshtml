@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+
+    var db = Database.Open("WebPagesMyScriptureJournal");
+    var selectCommand = "SELECT * FROM ScripNotes";
+    var searchTerm = "";
+
+        if (!Request.QueryString["searchBook"].IsEmpty())
+        {
+            selectCommand = "SELECT * FROM ScripNotes WHERE Book = @0";
+            searchTerm = Request.QueryString["searchBook"];
+        }
+
+        if (!Request.QueryString["searchDate Submitted"].IsEmpty())
+        {
+            selectCommand = "SELECT * FROM ScripNotes WHERE Date  = @0";
+            searchTerm = "%" + Request.QueryString["searchDate"] + "%";
+        }
+
+        var selectedData = db.Query(selectCommand, searchTerm);
+        var grid = new WebGrid(source: selectedData, defaultSort: "Book", rowsPerPage: 5);
+    }
+        <h2>List Notes</h2>
+        <form method="get">
+            <div>
+                <label for="searchBook">Book to look for:</label>
+                <input type="text" name="searchBook"
+                       value="@Request.QueryString["searchBook"]" />
+                <input type="Submit" value="Search Book" /><br />
+                (Leave blank to list all notes.)<br />
+            </div>
+            <div>
+                <label for="SearchDate">Date contains the following:</label>
+                <input type="text" name="searchDate" value="@Request.QueryString["searchDate"]" />
+                <input type="Submit" value="Search Date" /><br />
+            </div>
+        </form>
+        <div>
+            @grid.GetHtml(
+        tableStyle: "grid",
+        headerStyle: "head",
+        alternatingRowStyle: "alt",
+        columns: grid.Columns(
+            grid.Column(format: @<a href="~/EditNote?noteId=@item.noteId">Edit</a>),
+            grid.Column("Book"),
+            grid.Column("Chapter"),
+            grid.Column("Verse"),
+            grid.Column("Date"),
+            grid.Column("Note"),
+            grid.Column(format: @<a href="~/DeleteNote?noteId=@item.noteId">Delete</a>)
+       )
+    )
+        </div>
+        <p><a href="~/AddNote">Add a Note</a></p>

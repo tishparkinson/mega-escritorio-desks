@@ -1,0 +1,89 @@
+﻿@{
+    var book = "";
+    var chapter = "";
+    var verse = "";
+    var date = "";
+    var note = "";
+    var noteId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["noteId"].IsEmpty() && Request.QueryString["noteId"].IsInt())
+        {
+            noteId = Request.QueryString["noteId"];
+            var db = Database.Open("WebPagesMyScriptureJournal");
+            var dbCommand = "SELECT * FROM ScripNotes WHERE noteId = @0";
+            var row = db.QuerySingle(dbCommand, noteId);
+            if (row != null)
+            {
+                book = row.Book;
+                chapter = row.Chapter.ToString();
+                verse = row.Verse.ToString();
+                date = row.Date;
+                note = row.Note;
+            }
+            else
+            {
+                Validation.AddFormError("No note was found for that ID.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No note was found for that ID.");
+        }
+    }
+
+    if (IsPost && !Request["buttonDelete"].IsEmpty())
+    {
+        noteId = Request.Form["noteId"];
+        var db = Database.Open("WebPagesMyScriptureJournal");
+        var deleteCommand = "DELETE FROM ScripNotes WHERE noteId = @0";
+        db.Execute(deleteCommand, noteId);
+        Response.Redirect("~/Notes");
+    }
+}
+<html>
+<head>
+    <title>Delete a Movie</title>
+</head>
+<body>
+    <h1>Delete a Note</h1>
+    @Html.ValidationSummary()
+    <p><a href="~/Notes">Return to Notes</a></p>
+
+    <form method="post">
+        <fieldset>
+            <legend>Note Information</legend>
+
+            <p>
+                <span>Book:</span>
+                <span>@book</span>
+            </p>
+
+            <p>
+                <span>Chapter:</span>
+                <span>@chapter</span>
+            </p>
+
+            <p>
+                <span>Verse:</span>
+                <span>@verse</span>
+            </p>
+
+            <p>
+                <span>Date:</span>
+                <span>@date</span>
+            </p>
+
+            <p>
+                <span>Note:</span>
+                <span>@note</span>
+            </p>
+
+            <input type="hidden" name="noteid" value="@noteId" />
+            <p><input type="submit" name="buttonDelete" value="Delete Note" /></p>
+        </fieldset>
+        <p><a href="~/Notes">Return to Notes</a></p>
+    </form>
+</body>
+</html>
